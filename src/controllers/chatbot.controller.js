@@ -14,7 +14,7 @@ export const handleMessage = async (req, res) => {
   } else if (msg.includes("evento")) {
     response = "sección del sitio.";
   } else if (msg.includes("atiendeme")) {
-    response = "Claro, escríbeme tu pregunta ";
+    response = "Claro, escríbeme tu pregunta, en que puedo ayudarte";
   } else {
     response = "No entendí muy bien, ¿puedes repetirlo o reformular tu mensaje?";
   }
