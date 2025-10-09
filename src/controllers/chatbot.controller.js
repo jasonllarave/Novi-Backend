@@ -19,6 +19,6 @@ const response = getChatbotResponse(message);
 
 messageCount++;
 
-ReadableByteStreamController.json({reply: response, messageCount: messageCount});
+  res.json({ reply: response, messageCount: messageCount });
 
 };
