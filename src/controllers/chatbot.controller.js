@@ -1,23 +1,24 @@
-export const handleMessage = async (req, res) => {
+import {getChatbotResponse} from '../utils/responses.js';
+
+
+
+//contador de mensajes
+
+let messageCount = 0;
+
+
+export const handleMessage =  (req, res) => {
   const { message } = req.body;
 
   if (!message) {
     return res.status(400).json({ error: "No se recibió ningún mensaje" });
   }
+const response = getChatbotResponse(message);
 
-  let response = " soy Novi ";
+//incrementar el contador de mensajes
 
-  const msg = message.toLowerCase();
+messageCount++;
 
-  if (msg.includes("hola")) {
-    response = "¡hola desde backend!  ¿En qué puedo ayudarte ?";
-  } else if (msg.includes("evento")) {
-    response = "sección del sitio.";
-  } else if (msg.includes("atiendeme")) {
-    response = "Claro, escríbeme tu pregunta, en que puedo ayudarte";
-  } else {
-    response = "No entendí muy bien, ¿puedes repetirlo o reformular tu mensaje?";
-  }
+  res.json({ reply: response, messageCount: messageCount });
 
-  res.json({ reply: response });
 };
