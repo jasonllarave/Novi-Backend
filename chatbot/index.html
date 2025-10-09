@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novi - colombianoviolenta.org</title>
+    <link rel="stylesheet" href="./index.css">
+</head>
+<body>
+    <div class="robot-container" id="robot-container">
+        <div class="robot">
+            <div class="robot-head">
+                <div class="robot-eye left">
+                    <div class="robot-pupil" id="left-pupil"></div>
+                </div>
+                <div class="robot-eye right">
+                    <div class="robot-pupil" id="right-pupil"></div>
+                </div>
+                <div class="robot-mouth"></div>
+            </div>
+            <div class="robot-body"></div>
+            <div class="robot-arm left"></div>
+            <div class="robot-arm right"></div>
+        </div>
+        <div class="robot-sign">Soy Novi Estoy Para Ayudarte</div>
+    </div>
+
+    <div class="chat-container" id="chat-container">
+        <div class="chat-header">
+            <div>
+                <h2>Novi</h2>
+                <p>Asistencia para Visitas Colombianoviolenta</p>
+            </div>
+            <button class="minimize-btn" id="minimize-btn">−</button>
+        </div>
+        
+        <div class="messages-container" id="messages">
+            <div class="message bot-message">
+                Hola, soy Novi, Tu asistente virtual de Colombia Noviolenta, ¿en que puedo ayudarte hoy?
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typing">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        
+        <div class="input-container">
+            <div class="quick-buttons">
+                <button class="quick-button" onclick="sendQuickMessage('compras')">Compras</button>
+                <button class="quick-button" onclick="sendQuickMessage('eventos')">Próximos eventos</button>
+                <button class="quick-button" onclick="sendQuickMessage('ira')">Manejar la ira</button>
+                <button class="quick-button" onclick="sendQuickMessage('ansiedad')">Controlar ansiedad</button>
+                <button class="quick-button" onclick="sendQuickMessage('autoestima')">Autoestima</button>
+                <button class="quick-button" onclick="sendQuickMessage('recursos')">Recursos</button>
+            </div>
+            
+            <div class="input-wrapper">
+                <input type="text" id="user-input" placeholder="Escribe tu mensaje..." autocomplete="off">
+                <button class="send-button" id="send-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+            
+            <button class="emergency-button" id="emergency-btn">
+                   🔷🔹 Necesito ayuda urgente 🔷🔹
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const robotContainer = document.getElementById('robot-container');
+        const chatContainer = document.getElementById('chat-container');
+        const minimizeBtn = document.getElementById('minimize-btn');
+        const messagesContainer = document.getElementById('messages');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const emergencyBtn = document.getElementById('emergency-btn');
+        const typingIndicator = document.getElementById('typing');
+        const leftPupil = document.getElementById('left-pupil');
+        const rightPupil = document.getElementById('right-pupil');
+
+        function showChat() {
+            robotContainer.style.display = 'none';
+            chatContainer.style.display = 'flex';
+            userInput.focus();
+        }
+
+        function hideChat() {
+            chatContainer.style.display = 'none';
+            robotContainer.style.display = 'flex';
+        }
+
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
+            messageDiv.innerHTML = content;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            typingIndicator.style.display = 'block';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            typingIndicator.style.display = 'none';
+        }
+
+        function sendQuickMessage(topic) {
+            userInput.value = topic;
+            sendMessage();
+        }
+
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (message === '') return;
+
+            addMessage(message, true);
+            userInput.value = '';
+            
+            showTypingIndicator();
+            
+            // respuesta con fecht desde el backend
+            fetch('http://localhost:3000/api/chatbot/chatbot', { 
+
+                    method: 'POST',
+                    headers: {
+                        'content-Type': 'application/json'
+                    },
+                    doby: JSON.stringify({ message: message})
+
+                })   
+                .then(response => response.json())
+                .then(data => {
+                    hideTypingIndicator();
+                    addMessage(data.reply);
+
+
+                })
+        }
+
+        function handleEmergency() {
+            addMessage("Necesito orientacion para eventos importantes");
+            addMessage("Ofertas del Dia, compra productos en promocion");
+        }
+
+        // Función para mover los ojos del robot siguiendo el cursor
+        function moveEyes(e) {
+            const robot = document.querySelector('.robot');
+            const rect = robot.getBoundingClientRect();
+            
+            // Calcular la posición del robot en la pantalla
+            const robotCenterX = rect.left + rect.width / 2;
+            const robotCenterY = rect.top + rect.height / 2;
+            
+            // Calcular el ángulo entre el cursor y el centro del robot
+            const angle = Math.atan2(e.clientY - robotCenterY, e.clientX - robotCenterX);
+            
+            // Calcular la distancia del cursor al centro del robot
+            const distance = Math.min(
+                Math.sqrt(
+                    Math.pow(e.clientX - robotCenterX, 2) + 
+                    Math.pow(e.clientY - robotCenterY, 2)
+                ) / 10, 
+                4
+            );
+            
+            // Calcular la posición de las pupilas
+            const pupilX = Math.cos(angle) * distance;
+            const pupilY = Math.sin(angle) * distance;
+            
+            // Aplicar la posición a las pupilas
+            leftPupil.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
+            rightPupil.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
+        }
+
+        // Event listeners
+        robotContainer.addEventListener('click', showChat);
+        minimizeBtn.addEventListener('click', hideChat);
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+        emergencyBtn.addEventListener('click', handleEmergency);
+        
+        // Event listener para mover los ojos
+        document.addEventListener('mousemove', moveEyes);
+    </script>
+</body>
+</html>
